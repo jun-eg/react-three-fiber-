@@ -1,59 +1,42 @@
-import styles from './index.module.css';
+import type { NextPage } from 'next';
+import { useRef, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import type { Mesh } from 'three';
 
-const Home = () => {
+type BoxProps = {
+  position: [x: number, y: number, z: number];
+};
+
+const Box: React.FC<BoxProps> = (props) => {
+  const mesh = useRef<Mesh>(null!);
+  const [hovered, setHover] = useState(false);
+  const [active, setActive] = useState(false);
+  useFrame(() => (mesh.current.rotation.x += 0.01));
+
   return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code} style={{ backgroundColor: '#fafafa' }}>
-            pages/index.js
-          </code>
-        </p>
-
-        <div className={styles.grid}>
-          <a className={styles.card} href="https://nextjs.org/docs">
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a className={styles.card} href="https://nextjs.org/learn">
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a className={styles.card} href="https://github.com/vercel/next.js/tree/master/examples">
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <img src="vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
-    </div>
+    <mesh
+      {...props}
+      ref={mesh}
+      scale={active ? 1.5 : 1}
+      onClick={() => setActive(!active)}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => setHover(false)}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
+    </mesh>
   );
 };
+
+const Home: NextPage = () => (
+  <div style={{ width: '100vw', height: '100vh' }}>
+    <Canvas>
+      <ambientLight />
+      <pointLight position={[10, 10, 10]} />
+      <Box position={[-1.2, 0, 0]} />
+      <Box position={[1.2, 0, 0]} />
+    </Canvas>
+  </div>
+);
 
 export default Home;
